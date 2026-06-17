@@ -5,7 +5,7 @@ const initState = {value:0, toggle: true}
 
 const counterReducer =(state = initState, action)=>{
     if(action.type === 'increase'){
-        return {...state, value: state.value + action.payload.number}
+        return {...state, value: state.value + action.payload}
     }
 
     if (action.type === "decrease") {
