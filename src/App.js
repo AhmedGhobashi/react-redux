@@ -1,56 +1,58 @@
 import "./App.css";
 import {useSelector, useDispatch} from 'react-redux';
 import { useEffect, useCallback } from "react";
+import {increase, decrease} from './store/counterSlice';
+import { logIn, logOut } from "./store/authSlice";
+
 
 function App() {
-  // DISPATHC VARIABLE
+ 
   const dispatch = useDispatch();
-
-  // MY STATES FROM RODUCER-STORE
   const globalState = useSelector((state)=>state);
-  // const state = useSelector((state)=> {
-  //   return state.value});
-  // const showtoggleState = useSelector((state)=> state.toggle);
 
-
-
-
-  // DISPATCH FUNCTIONS
-
-  const handleGlobalState = (value)=>{
-    if (value < 1){
-      return 0
-    }
-    return value;
+  const isLogged = ()=>{
+    return globalState.auth.isLoggedIn
   }
 
-      /* I used useCallback here to avoid infinity rendering and asked it to not run this function until a new dipatch happends */
-  const counterHandler = useCallback((type, payload)=>{
-    dispatch({type:type, payload:payload});
-  },[dispatch]);
+  const loginHandler = (state)=>{
+    console.log(state);
+    if (state){
+      dispatch (logOut());
+    }else{
+      dispatch(logIn());
+    }
+  }
 
-  const showCounter = ()=>{
-      dispatch ({type: "toggleCounter"});
-   }
+  const counterHandler =  useCallback((type, amount)=>{
+    if(type === "increase"){
+      dispatch (increase(amount));
+    }else{
+      dispatch (decrease(amount));
+    }
+  },[dispatch])
 
-   useEffect (()=>{
-    counterHandler("increase", 10)
-   },[])
+  useEffect(()=>{
+    counterHandler("increase", 5);
+  },[counterHandler])
+
   return (
     <div className="App">
       <h1>Hello Redux Basic</h1>
-      {globalState.toggle && (
+     
+       {isLogged()&&(
         <>
-      <div className="counter">Counter: {handleGlobalState(globalState.value)}</div>
+      <div className="counter">Counter: {globalState.counter.value}</div>
       <div>
-          <button className="btn" onClick={()=>counterHandler("increase", 10)}>increase +</button>
-          <button className="btn" onClick={()=>counterHandler("decrease", 5)}>decrease -</button>
+          <button className="btn" onClick={()=> counterHandler("increase",5)}>increase +</button>
+          <button className="btn" onClick={()=>counterHandler("decrease",5)}>decrease -</button>
       </div>
+
         </>
-      )}
+       )}
+
       
       <div>
-        <button className="btn" onClick={showCounter}>Hide/Show Counter Number</button>
+        <button className="btn" onClick={()=>loginHandler(isLogged())}>{ isLogged() ? 'logOut': "logIn"}</button>
       </div>
 
     </div>
